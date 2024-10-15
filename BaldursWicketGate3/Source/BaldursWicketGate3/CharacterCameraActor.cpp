@@ -102,15 +102,13 @@ void ACharacterCameraActor::OnCameraMoveInputTriggered(const FVector2D& InputMov
 
 	FVector NewLocation = GetActorLocation() + Movement;
 	FVector TargetActorLocation = TargetActor->GetActorLocation();
-	TargetActorLocation.Z = NewLocation.Z;
 	
 	float DistanceToCharacter = FVector::Dist2D(NewLocation, TargetActorLocation);
 	if(DistanceToCharacter > MaxCameraDistance)
 	{
-		FVector DistanceToCamera = (NewLocation - TargetActorLocation).GetSafeNormal2D();
-		NewLocation = TargetActorLocation + DistanceToCamera * MaxCameraDistance;
+		NewLocation = GetActorLocation();
 	}
-
+		
 	NewLocation.Z = GetActorLocation().Z;
 	SetActorLocation(NewLocation);
 }

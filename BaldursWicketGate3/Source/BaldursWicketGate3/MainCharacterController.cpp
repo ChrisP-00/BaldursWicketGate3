@@ -67,11 +67,9 @@ void AMainCharacterController::SetupInputComponent()
 		/* Bind Camera Inputs */
 		EnhancedInputComponent->BindAction(CameraMovementControl, ETriggerEvent::Triggered, this, &AMainCharacterController::OnCameraMoveInputTriggered);
 		EnhancedInputComponent->BindAction(CameraLocationReset, ETriggerEvent::Started, this, &AMainCharacterController::OnResetCameraPosition);
-		EnhancedInputComponent->BindAction(CameraLocationReset, ETriggerEvent::Completed, this, &AMainCharacterController::OnResetCameraPosition);
 		EnhancedInputComponent->BindAction(MouseWheelClick, ETriggerEvent::Started, this, &AMainCharacterController::OnMouseWheelToggled);
 		EnhancedInputComponent->BindAction(CameraRotateByMouse, ETriggerEvent::Triggered, this, &AMainCharacterController::OnCameraRotateInputByMouse);
 		EnhancedInputComponent->BindAction(CameraRotateByKeyboard, ETriggerEvent::Triggered, this, &AMainCharacterController::OnCameraRotateInputByKeyboard);
-		EnhancedInputComponent->BindAction(CameraMovementControl, ETriggerEvent::Triggered, this, &AMainCharacterController::OnCameraRotateInputByMouse);
 		EnhancedInputComponent->BindAction(MouseWheelCameraZoom, ETriggerEvent::Triggered, this, &AMainCharacterController::OnCameraZoomInputTriggered);
 	}
 	else

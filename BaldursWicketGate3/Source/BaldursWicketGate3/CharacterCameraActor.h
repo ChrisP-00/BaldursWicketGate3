@@ -63,7 +63,7 @@ private:
 	/* Camera Control Input Values */
 	FVector2D CameraInput;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
-	float CameraMovingSpeed = 50.f;
+	float CameraMovingSpeed = 25.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
 	float MaxCameraDistance = 1000.f;
 
