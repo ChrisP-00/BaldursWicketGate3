@@ -16,29 +16,16 @@ AMainCharacter::AMainCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	/*// Don't rotate character to camera direction
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
-	GetCharacterMovement()->bOrientRotationToMovement = true;*/
 	
-	/*/* Set Camera Arm Spring #1#
-	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
-	RootComponent = SpringArm;
-	SpringArm->TargetArmLength = CameraArmLength;
-	SpringArm->SetRelativeRotation(CameraArmAngle);
-
-	SpringArm->bUsePawnControlRotation = false;
-	SpringArm->bDoCollisionTest = false;
-	SpringArm->bInheritPitch = false;
-	SpringArm->bInheritRoll = false;
-	SpringArm->bInheritYaw = false;
-
-	/* Create Camera #1#
-	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera Comp"));
-	CameraComp->SetupAttachment(SpringArm);
-	CameraComp->bUsePawnControlRotation = false;*/
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bConstrainToPlane = true;
+	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+	GetCharacterMovement()->RotationRate = RotationSpeed;
 }
+
 
 void AMainCharacter::PossessedBy(AController* NewController)
 {

@@ -24,18 +24,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCapsuleComponent* CapsuleComp;*/
-	/*
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	USpringArmComponent* SpringArm;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* CameraComp;
-	*/
-
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	float CameraArmLength = 800.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	FRotator CameraArmAngle = FRotator(-60.f, 0.f, 0.f);*/
+	FRotator RotationSpeed = FRotator(0.f, 640.f, 0.f);
 };
