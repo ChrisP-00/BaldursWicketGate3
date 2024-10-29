@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "CharacterCameraActor.generated.h"
 
+class UFloatingPawnMovement;
 class USplineComponent;
 class UCharacterMovementComponent;
 class UCameraComponent;
@@ -52,8 +53,6 @@ private:
 	USpringArmComponent* SpringArm;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* CameraComp;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCharacterMovementComponent* CharacterMovementComp;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Spline, meta = (AllowPrivateAccess = "true"))
 	USplineComponent* SplineComponent;
 	
@@ -72,6 +71,8 @@ private:
 	float CameraArmLength = 150.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	FRotator CameraArmAngle = FRotator(-60.f, 0.f, 0.f);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	float CameraLocationDeltaTime = 10.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	float CameraRotationDeltaTime = 5.f;
 	
@@ -93,6 +94,8 @@ private:
 	float ZoomSpeed = 0.1f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
 	float CurrentZoomValue = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
+	float TargetZoomValue = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
 	FVector CameraSplinePosition = FVector(-170.f, 0.f, 0.f);
@@ -104,7 +107,7 @@ private:
 	FVector TopPointCustomTangent = FVector(119.f, 0.f,-780.f);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
 	FVector ShoulderPointCustomTangent = FVector(480.f, 0.f,-80.f);
-	
+	float SplineLength = 0.f;
 	
 	// Camera Rotation Control Values
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))

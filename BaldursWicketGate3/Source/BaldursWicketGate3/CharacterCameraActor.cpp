@@ -8,6 +8,7 @@
 #include "DrawDebugHelpers.h"
 #include "Components/SplineComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/FloatingPawnMovement.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
@@ -37,12 +38,7 @@ ACharacterCameraActor::ACharacterCameraActor()
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera Comp"));
 	CameraComp->SetupAttachment(SpringArm);
 	CameraComp->bUsePawnControlRotation = false;
-
-	/* Character Movement Component */
-	CharacterMovementComp = CreateDefaultSubobject<UCharacterMovementComponent>(TEXT("Character Movement"));
-	CharacterMovementComp->bOrientRotationToMovement = true;
-	CharacterMovementComp->bConstrainToPlane = true;
-
+	
 	// spline point , point type, spline position
 	SplineComponent = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
 	SplineComponent->SetupAttachment(RootComp);
@@ -54,14 +50,14 @@ ACharacterCameraActor::ACharacterCameraActor()
 	SplineComponent->SetTangentAtSplinePoint(TopPoint, TopPointCustomTangent, ESplineCoordinateSpace::Local);
 	SplineComponent->SetTangentAtSplinePoint(ShoulderPoint, ShoulderPointCustomTangent, ESplineCoordinateSpace::Local);
 	SplineComponent->UpdateSpline();
+	SplineLength = SplineComponent->GetSplineLength();
 	
 	/* ==== Debugging ==== */
 	SpringArm->bDrawDebugLagMarkers = true;
 	
 	UStaticMeshComponent* Dummy = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sphere"));
 	Dummy->SetupAttachment(RootComp);
-
-	// 큐브 메시를 기본 큐브로 설정 (UE 에디터 내 기본 제공 메시 사용)	
+	
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> DummyAsset(TEXT("/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere"));
 	if (DummyAsset.Succeeded())
 	{
@@ -71,9 +67,8 @@ ACharacterCameraActor::ACharacterCameraActor()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No Asset!"));
 	}
-
-	// 큐브 크기와 위치 설정
-	Dummy->SetRelativeScale3D(FVector(1.f)); // 큐브 크기 조정
+	
+	Dummy->SetRelativeScale3D(FVector(1.f)); 
 	Dummy->SetRelativeLocation(FVector::ZeroVector);
 	Dummy->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }	
@@ -115,16 +110,27 @@ void ACharacterCameraActor::OnCameraMoveInputTriggered(const FVector2D& InputMov
 	FVector Movement = (ForwardVector * InputMovementValue.Y) + (RightVector * InputMovementValue.X);
 	Movement *= CameraMovingSpeed;
 
-	FVector NewLocation = GetActorLocation() + Movement;
+	FVector CurrentLocation = GetActorLocation();
+	FVector NewLocation = CurrentLocation + Movement;
 	FVector TargetActorLocation = TargetActor->GetActorLocation();
-	
-	float DistanceToCharacter = FVector::Dist2D(NewLocation, TargetActorLocation);
-	if(DistanceToCharacter > MaxCameraDistance)
+
+	float CurrentDistanceToTarget = FVector::Dist(CurrentLocation, TargetActorLocation);
+	float NewDistanceToTarget = FVector::Dist(NewLocation, TargetActorLocation);
+
+	if(NewDistanceToTarget >= MaxCameraDistance)
 	{
-		NewLocation = GetActorLocation();
+		FVector DirectionToTarget = (TargetActorLocation - CurrentLocation).GetSafeNormal();
+		FVector DesiredMovementDirection = (NewLocation - CurrentLocation).GetSafeNormal();
+
+		float DotProduct = FVector::DotProduct(DirectionToTarget, DesiredMovementDirection);
+
+		if(DotProduct <= 0 || NewDistanceToTarget >= CurrentDistanceToTarget)
+		{
+			return;
+		}
 	}
 		
-	NewLocation.Z = GetActorLocation().Z;
+	NewLocation.Z = TargetActorLocation.Z;
 	SetActorLocation(NewLocation);
 }
 
@@ -141,17 +147,21 @@ void ACharacterCameraActor::MouseWheelState(const bool bIsPressed)
 void ACharacterCameraActor::OnCameraZoomInputTriggered(const float ZoomValue)
 {
 	float NewPitch = ZoomValue * ZoomSpeed;
+	TargetZoomValue = FMath::Clamp(CurrentZoomValue + NewPitch, 0.f, 1.f);
 	
-	CurrentZoomValue += NewPitch;
-	CurrentZoomValue = FMath::Clamp(CurrentZoomValue, 0.f, 1.f);
-
-	SpringArm->SetWorldLocation(SplineComponent->GetLocationAtTime(CurrentZoomValue, ESplineCoordinateSpace::World));
+	float TargetDistance = TargetZoomValue * SplineLength;
+	
+	FVector CurrentLocation = SpringArm->GetComponentLocation();
+	FVector TargetLocation = SplineComponent->GetLocationAtDistanceAlongSpline(TargetDistance, ESplineCoordinateSpace::World);
+	FVector SmoothLocation = FMath::VInterpTo(CurrentLocation, TargetLocation, GetWorld()->GetDeltaSeconds(), CameraLocationDeltaTime);
+	SpringArm->SetWorldLocation(SmoothLocation);
 
 	FRotator CurrentRotation = SpringArm->GetComponentRotation();
 	FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(CameraComp->GetComponentLocation(), this->GetActorLocation());
-	FRotator SmoothRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), CameraRotationDeltaTime);
-	
-	SpringArm->SetWorldRotation(SmoothRotation);	
+	FRotator SmoothRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, GetWorld()->GetDeltaSeconds(), CameraRotationDeltaTime);	
+	SpringArm->SetWorldRotation(SmoothRotation);
+
+	CurrentZoomValue = TargetZoomValue;
 }
 
 void ACharacterCameraActor::OnCameraRotateInputTriggered(const float InputValue)
