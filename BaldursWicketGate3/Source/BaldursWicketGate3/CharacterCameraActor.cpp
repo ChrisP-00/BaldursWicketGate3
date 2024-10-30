@@ -33,12 +33,13 @@ ACharacterCameraActor::ACharacterCameraActor()
 	SpringArm->bInheritRoll = false;
 	SpringArm->bInheritYaw = true;
 	SpringArm->bDoCollisionTest = false;
-
+	SpringArm->bEnableCameraLag = true;		// lerp for smooth movement 
+	
 	/* Create Camera */
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera Comp"));
 	CameraComp->SetupAttachment(SpringArm);
 	CameraComp->bUsePawnControlRotation = false;
-	
+
 	// spline point , point type, spline position
 	SplineComponent = CreateDefaultSubobject<USplineComponent>(TEXT("Spline"));
 	SplineComponent->SetupAttachment(RootComp);

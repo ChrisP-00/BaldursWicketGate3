@@ -61,7 +61,7 @@ private:
 	bool bIsMouseWheelClicked = false;	// Is Camera rotated by mouse
 
 	/* Lock to Character */
-	bool bIsLockToCharacter = false;
+	bool bIsLockToCharacter = true;
 	
 	
 	/* Camera Control */
