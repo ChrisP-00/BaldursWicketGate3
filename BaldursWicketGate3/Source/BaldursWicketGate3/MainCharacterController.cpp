@@ -4,9 +4,8 @@
 #include "MainCharacterController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
-#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/SpringArmComponent.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "CharacterCameraActor.h"
 
 
@@ -66,7 +65,7 @@ void AMainCharacterController::SetupInputComponent()
 
 		/* Bind Camera Inputs */
 		EnhancedInputComponent->BindAction(CameraMovementControl, ETriggerEvent::Triggered, this, &AMainCharacterController::OnCameraMoveInputTriggered);
-		EnhancedInputComponent->BindAction(CameraLocationReset, ETriggerEvent::Started, this, &AMainCharacterController::OnResetCameraPosition);
+		EnhancedInputComponent->BindAction(CameraLockToCharacter, ETriggerEvent::Started, this, &AMainCharacterController::OnLockCameraToCharacter);
 		EnhancedInputComponent->BindAction(MouseWheelClick, ETriggerEvent::Started, this, &AMainCharacterController::OnMouseWheelToggled);
 		EnhancedInputComponent->BindAction(CameraRotateByMouse, ETriggerEvent::Triggered, this, &AMainCharacterController::OnCameraRotateInputByMouse);
 		EnhancedInputComponent->BindAction(CameraRotateByKeyboard, ETriggerEvent::Triggered, this, &AMainCharacterController::OnCameraRotateInputByKeyboard);
@@ -100,12 +99,21 @@ void AMainCharacterController::OnSetDestinationTriggered()
 	{
 		return;
 	}
-	
+
+	bIsFollowingMouse = true;
 	MoveToTargetDestination();
 }
 
 void AMainCharacterController::OnSetDestinationCompleted()
 {
+	if(bIsFollowingMouse)
+	{
+		StopMovement();
+		bIsFollowingMouse = false;
+		HoldTime = 0.f;
+		return;
+	}
+	
 	MoveToTargetDestination();
 	HoldTime = 0.f;
 }
@@ -170,7 +178,7 @@ void AMainCharacterController::OnMouseWheelToggled(const FInputActionValue& Valu
 }
 
 
-void AMainCharacterController::OnResetCameraPosition()
+void AMainCharacterController::OnLockCameraToCharacter()
 {
-	CameraActor->ResetCameraPosition();
+	CameraActor->LockCameraToCharacter();
 }

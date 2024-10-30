@@ -37,7 +37,7 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category=Input)
 	UInputAction* CameraMovementControl;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category=Input)
-	UInputAction* CameraLocationReset;
+	UInputAction* CameraLockToCharacter;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category=Input)
 	UInputAction* CameraRotateByKeyboard;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category=Input)
@@ -66,7 +66,7 @@ protected:
 	void OnCameraZoomInputTriggered(const FInputActionValue& Value);		// Mouse wheel to zoom camera
 	UFUNCTION()
 	void OnMouseWheelToggled(const FInputActionValue& Value);
-	void OnResetCameraPosition();
+	void OnLockCameraToCharacter();
 private:
 
 	/* Movement Input Delay Time */
@@ -80,4 +80,5 @@ private:
 	ACharacterCameraActor* CameraActor;
 
 	bool bIsMouseWheelClicked = false;
+	bool bIsFollowingMouse = false;
 };	

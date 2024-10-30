@@ -51,7 +51,7 @@ ACharacterCameraActor::ACharacterCameraActor()
 	SplineComponent->SetTangentAtSplinePoint(ShoulderPoint, ShoulderPointCustomTangent, ESplineCoordinateSpace::Local);
 	SplineComponent->UpdateSpline();
 	SplineLength = SplineComponent->GetSplineLength();
-	
+
 	/* ==== Debugging ==== */
 	SpringArm->bDrawDebugLagMarkers = true;
 	
@@ -80,16 +80,17 @@ void ACharacterCameraActor::BeginPlay()
 	
 }
 
-void ACharacterCameraActor::RepositionCamera()
-{
-	SetActorLocation(TargetActor->GetActorLocation());
-}
-
-
 // Called every frame
 void ACharacterCameraActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if(!bIsLockToCharacter)
+	{
+		return; 
+	}
+
+	SetActorLocation(TargetActor->GetActorLocation());
 }
 
 void ACharacterCameraActor::SetTarget(AActor* ControlledActor)
@@ -98,12 +99,12 @@ void ACharacterCameraActor::SetTarget(AActor* ControlledActor)
 
 	FRotator SpringArmRotation = UKismetMathLibrary::FindLookAtRotation(CameraComp->GetComponentLocation(), this->GetActorLocation());
 	SpringArm->SetWorldRotation(SpringArmRotation);
-
-	RepositionCamera();
 }
 
 void ACharacterCameraActor::OnCameraMoveInputTriggered(const FVector2D& InputMovementValue)
 {
+	bIsLockToCharacter = false;
+	
 	FVector ForwardVector = GetActorForwardVector();
 	FVector RightVector = GetActorRightVector();
 
@@ -134,9 +135,9 @@ void ACharacterCameraActor::OnCameraMoveInputTriggered(const FVector2D& InputMov
 	SetActorLocation(NewLocation);
 }
 
-void ACharacterCameraActor::ResetCameraPosition()
+void ACharacterCameraActor::LockCameraToCharacter()
 {
-	SetActorLocation(TargetActor->GetActorLocation());
+	bIsLockToCharacter = true;	
 }
 
 void ACharacterCameraActor::MouseWheelState(const bool bIsPressed)

@@ -28,7 +28,7 @@ public:
 
 	UFUNCTION()
 	void OnCameraMoveInputTriggered(const FVector2D& InputMovementValue);
-	void ResetCameraPosition();
+	void LockCameraToCharacter();
 	UFUNCTION()
 	void MouseWheelState(const bool bIsPressed);
 	UFUNCTION()
@@ -60,13 +60,16 @@ private:
 	bool bIsCameraPositionSet = false;	// Is Follow Mode
 	bool bIsMouseWheelClicked = false;	// Is Camera rotated by mouse
 
+	/* Lock to Character */
+	bool bIsLockToCharacter = false;
+	
+	
 	/* Camera Control */
 	FVector2D CameraInput;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
 	float CameraMovingSpeed = 25.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
 	float MaxCameraDistance = 1000.f;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	float CameraArmLength = 150.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -77,26 +80,14 @@ private:
 	float CameraRotationDeltaTime = 5.f;
 	
 	// Camera Pictch and Zoom Distance Control Values
-	float ZoomDistance;
-	float ZoomPitch;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
-	float MinZoomDistance = 350.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
-	float MaxZoomDistance = 900.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
-	float MinZoomPitch = -25.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
-	float MaxZoomPitch = -60.f;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
 	float ZoomSpeed = 0.1f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
 	float CurrentZoomValue = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
 	float TargetZoomValue = 0;
-	
+
+	// Spline Setting Values 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
 	FVector CameraSplinePosition = FVector(-170.f, 0.f, 0.f);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
@@ -112,8 +103,6 @@ private:
 	// Camera Rotation Control Values
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Input, meta=(AllowPrivateAccess=true))
 	float CameraRotationSpeed = 1.f;
-	
-	/* Functions */
-	void RepositionCamera();
 
+	
 };
